@@ -1,6 +1,6 @@
 const SUPABASE_URL = 'https://nmemmfblpzrkwyljpmvp.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Lc7rXKQ-1TJaQFu7a-nOVQ_5Sf3x__M';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
 let allIntakes = [];
@@ -8,7 +8,7 @@ let currentDetail = null;
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await supabaseClient.auth.getSession();
   if (session) showDashboard(session.user);
   else showScreen('login-screen');
 });
@@ -20,13 +20,13 @@ document.getElementById('login-btn').addEventListener('click', async () => {
   const errEl = document.getElementById('login-error');
   errEl.classList.add('hidden');
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
   if (error) { errEl.textContent = error.message; errEl.classList.remove('hidden'); return; }
   showDashboard(data.user);
 });
 
 document.getElementById('logout-btn').addEventListener('click', async () => {
-  await supabase.auth.signOut();
+  await supabaseClient.auth.signOut();
   showScreen('login-screen');
 });
 
@@ -65,7 +65,7 @@ document.getElementById('back-to-pipeline').addEventListener('click', () => {
 
 // ─── PIPELINE ─────────────────────────────────────────────────────────────────
 async function loadPipeline() {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .schema('analytix')
     .from('intake_summary')
     .select('*')
@@ -215,7 +215,7 @@ async function updateStatus(sessionId) {
   const updates = { status: newStatus };
   if (newStatus === 'converted') updates.converted_at = new Date().toISOString();
 
-  const { error } = await supabase
+  const { error } = await supabaseClient
     .schema('analytix')
     .from('intake_sessions')
     .update(updates)
