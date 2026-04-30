@@ -1,6 +1,8 @@
 const SUPABASE_URL = 'https://hhyhulqngdkwsxhymmcd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_haKvwV0M7KMj4Qz69M6WGg_KmIfU-aI';
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+});
 
 const TOTAL_STEPS = 6;
 let currentStep = 1;
@@ -22,8 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Capture UTM params from URL
   const params = new URLSearchParams(window.location.search);
   window._utm = {
-    utm_campaign:   params.get('utm_campaign') || null,
-    utm_medium:     params.get('utm_medium')   || null,
+    utm_campaign:    params.get('utm_campaign') || null,
+    utm_medium:      params.get('utm_medium')   || null,
     referral_source: params.get('ref') || (document.referrer ? document.referrer : null),
   };
 
@@ -128,18 +130,24 @@ async function saveStep1() {
       .schema('analytix')
       .from('intake_sessions')
       .insert({
-        service_tier:     selectedTier,
-        status:           'started',
-        utm_campaign:     window._utm.utm_campaign,
-        utm_medium:       window._utm.utm_medium,
-        referral_source:  window._utm.referral_source,
-        completed_steps:  ['tier'],
+        service_tier:    selectedTier,
+        status:          'started',
+        utm_campaign:    window._utm.utm_campaign,
+        utm_medium:      window._utm.utm_medium,
+        referral_source: window._utm.referral_source,
+        completed_steps: ['tier'],
       })
       .select('id')
-      .single();
+      .maybeSingle();
 
     if (error) {
       showError(1, 'Could not start session: ' + error.message);
+      setSaving('');
+      return false;
+    }
+
+    if (!data) {
+      showError(1, 'Session was not created. Please try again.');
       setSaving('');
       return false;
     }
@@ -302,21 +310,21 @@ async function saveStep6() {
 
   const { error: notesErr } = await db.schema('analytix').from('intake_notes')
     .upsert({
-      session_id:            sessionId,
-      biggest_challenge:     biggestChallenge,
+      session_id:              sessionId,
+      biggest_challenge:       biggestChallenge,
       what_success_looks_like: whatSuccess,
-      why_now:               val('why-now')          || null,
-      competitor_references: val('competitor-refs')  || null,
-      anything_else:         val('anything-else')    || null,
+      why_now:                 val('why-now')         || null,
+      competitor_references:   val('competitor-refs') || null,
+      anything_else:           val('anything-else')   || null,
     }, { onConflict: 'session_id' });
 
   if (notesErr) { showError(6, 'Error saving notes: ' + notesErr.message); setSaving(''); return false; }
 
   const { error: sessionErr } = await db.schema('analytix').from('intake_sessions')
     .update({
-      status:           'submitted',
-      completed_steps:  ['tier', 'contact', 'business', 'scope', 'readiness', 'notes'],
-      updated_at:       new Date().toISOString(),
+      status:          'submitted',
+      completed_steps: ['tier', 'contact', 'business', 'scope', 'readiness', 'notes'],
+      updated_at:      new Date().toISOString(),
     })
     .eq('id', sessionId);
 
@@ -342,7 +350,6 @@ function checked(id) {
   return document.getElementById(id).checked;
 }
 async function appendStep(stepName) {
-  // Touch updated_at; completed_steps array is set in full on final submit
   await db.schema('analytix').from('intake_sessions')
     .update({ updated_at: new Date().toISOString() })
     .eq('id', sessionId);
