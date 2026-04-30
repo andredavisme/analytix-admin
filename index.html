@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>207 Analytix — Admin</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen" class="screen active">
+    <div class="login-box">
+      <div class="logo">207 Analytix</div>
+      <p class="login-sub">Admin Dashboard</p>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="admin@207analytix.com" />
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" />
+      </div>
+      <button id="login-btn" class="btn-primary">Sign In</button>
+      <p id="login-error" class="error-msg hidden"></p>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard-screen" class="screen">
+
+    <aside class="sidebar">
+      <div class="sidebar-logo">207 Analytix</div>
+      <nav>
+        <a href="#" class="nav-item active" data-view="pipeline">📋 Pipeline</a>
+        <a href="#" class="nav-item" data-view="intelligence">📊 Intelligence</a>
+        <a href="#" class="nav-item" data-view="detail">🔍 Detail</a>
+      </nav>
+      <div class="sidebar-footer">
+        <span id="admin-email-label"></span>
+        <button id="logout-btn" class="btn-ghost">Sign Out</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+
+      <!-- PIPELINE VIEW -->
+      <section id="view-pipeline" class="view active">
+        <div class="view-header">
+          <h1>Intake Pipeline</h1>
+          <div class="filters">
+            <select id="filter-status">
+              <option value="all">All Statuses</option>
+              <option value="started">Started</option>
+              <option value="submitted">Submitted</option>
+              <option value="reviewed">Reviewed</option>
+              <option value="converted">Converted</option>
+              <option value="archived">Archived</option>
+            </select>
+            <select id="filter-tier">
+              <option value="all">All Tiers</option>
+              <option value="discovery">Discovery</option>
+              <option value="consultation">Consultation</option>
+            </select>
+            <button id="refresh-btn" class="btn-ghost">↻ Refresh</button>
+          </div>
+        </div>
+
+        <div class="stat-strip" id="stat-strip">
+          <div class="stat-card" id="stat-total"><span class="stat-num">—</span><span class="stat-label">Total Intakes</span></div>
+          <div class="stat-card" id="stat-submitted"><span class="stat-num">—</span><span class="stat-label">Submitted</span></div>
+          <div class="stat-card" id="stat-converted"><span class="stat-num">—</span><span class="stat-label">Converted</span></div>
+          <div class="stat-card" id="stat-rate"><span class="stat-num">—</span><span class="stat-label">Conv. Rate</span></div>
+        </div>
+
+        <div class="table-wrap">
+          <table id="pipeline-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Business</th>
+                <th>Industry</th>
+                <th>Stage</th>
+                <th>Tier</th>
+                <th>Project Type</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="pipeline-body">
+              <tr><td colspan="9" class="loading-cell">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- INTELLIGENCE VIEW -->
+      <section id="view-intelligence" class="view">
+        <div class="view-header">
+          <h1>Business Intelligence</h1>
+        </div>
+        <div class="bi-grid">
+          <div class="bi-card">
+            <h3>Industry Breakdown</h3>
+            <div id="chart-industry" class="chart-container"></div>
+          </div>
+          <div class="bi-card">
+            <h3>Project Type Demand</h3>
+            <div id="chart-project-type" class="chart-container"></div>
+          </div>
+          <div class="bi-card">
+            <h3>Business Stage Distribution</h3>
+            <div id="chart-stage" class="chart-container"></div>
+          </div>
+          <div class="bi-card">
+            <h3>Budget Range Mix</h3>
+            <div id="chart-budget" class="chart-container"></div>
+          </div>
+          <div class="bi-card full-width">
+            <h3>Top Challenges (from free text)</h3>
+            <div id="challenge-list" class="challenge-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DETAIL VIEW -->
+      <section id="view-detail" class="view">
+        <div class="view-header">
+          <button id="back-to-pipeline" class="btn-ghost">← Back to Pipeline</button>
+          <h1 id="detail-title">Intake Detail</h1>
+        </div>
+        <div id="detail-body" class="detail-grid"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
