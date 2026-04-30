@@ -1,0 +1,32 @@
+name: Vendor supabase-js
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/vendor-supabase.yml'
+
+jobs:
+  vendor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download supabase UMD bundle
+        run: |
+          mkdir -p vendor
+          curl -sL "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" \
+            -o vendor/supabase.min.js
+          echo "Downloaded $(wc -c < vendor/supabase.min.js) bytes"
+
+      - name: Commit vendor file
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add vendor/supabase.min.js
+          git diff --cached --quiet && echo "No changes" || \
+            (git commit -m "chore: update vendored supabase.min.js" && git push)
