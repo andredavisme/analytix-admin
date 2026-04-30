@@ -1,5 +1,5 @@
-const SUPABASE_URL = 'https://nmemmfblpzrkwyljpmvp.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_Lc7rXKQ-1TJaQFu7a-nOVQ_5Sf3x__M';
+const SUPABASE_URL = 'https://hhyhulqngdkwsxhymmcd.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_haKvwV0M7KMj4Qz69M6WGg_KmIfU-aI';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const TOTAL_STEPS = 6;
